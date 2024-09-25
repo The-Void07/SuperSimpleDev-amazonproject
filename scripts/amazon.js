@@ -1,4 +1,4 @@
-import { cart } from "../data/cart.js";
+import { cart, addToCart } from "../data/cart.js";
 import { products } from "../data/products.js";
 
 let productsHtml = "";
@@ -58,61 +58,49 @@ products.forEach((product) => {
 
 document.querySelector(".js-products-grid").innerHTML = productsHtml;
 
+function itemsInCart() {
+  let cartQuantity = 0;
+
+  cart.forEach((item) => {
+    cartQuantity += item.quantity;
+  });
+  document.querySelector(".js-cart-quantity").innerHTML = cartQuantity;
+}
+
+function addedNotification(productId) {
+  const addedMessage = document.querySelector(`.js-added-to-cart-${productId}`);
+  addedMessage.classList.add("add-Opacity");
+
+  const addedMessageTimeouts = {};
+  const previousTimeoutId = addedMessageTimeouts[productId];
+
+  if (previousTimeoutId) {
+    console
+      .log
+      // `Previous Timeout for product ${productId}: ${previousTimeoutId}`
+      ();
+    clearTimeout(previousTimeoutId);
+    // console.log(`Timeout for product ${productId} cleared.`);
+  }
+
+  const startTimeOutId = setTimeout(() => {
+    addedMessage.classList.remove("add-Opacity");
+  }, 2000);
+
+  addedMessageTimeouts[productId] = startTimeOutId;
+  //console.log(`New Timeout for product ${productId}: ${startTimeOutId}`);
+}
+
 document.querySelectorAll(".js-add-to-cart").forEach((button) => {
   button.addEventListener("click", () => {
     const { productId } = button.dataset;
-
     const selectedValue = document.querySelector(
       `.js-quantity-selector-${productId}`
     );
     const quantity = Number(selectedValue.value);
 
-    let matchingItem;
-
-    cart.forEach((item) => {
-      if (productId === item.productId) {
-        matchingItem = item;
-      }
-    });
-
-    if (matchingItem) {
-      matchingItem.quantity = quantity;
-    } else {
-      cart.push({
-        productId,
-        quantity,
-      });
-    }
-
-    let cartQuantity = 0;
-
-    cart.forEach((item) => {
-      cartQuantity += item.quantity;
-    });
-
-    document.querySelector(".js-cart-quantity").innerHTML = cartQuantity;
-    const addedMessage = document.querySelector(
-      `.js-added-to-cart-${productId}`
-    );
-    addedMessage.classList.add("add-Opacity");
-
-    const addedMessageTimeouts = {};
-    const previousTimeoutId = addedMessageTimeouts[productId];
-
-    if (previousTimeoutId) {
-      console
-        .log
-        // `Previous Timeout for product ${productId}: ${previousTimeoutId}`
-        ();
-      clearTimeout(previousTimeoutId);
-      // console.log(`Timeout for product ${productId} cleared.`);
-    }
-
-    const startTimeOutId = setTimeout(() => {
-      addedMessage.classList.remove("add-Opacity");
-    }, 2000);
-
-    addedMessageTimeouts[productId] = startTimeOutId;
-    //console.log(`New Timeout for product ${productId}: ${startTimeOutId}`);
+    addToCart(productId, quantity);
+    itemsInCart();
+    addedNotification(productId);
   });
 });
