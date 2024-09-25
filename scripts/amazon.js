@@ -1,4 +1,8 @@
+import { cart } from "../data/cart.js";
+import { products } from "../data/products.js";
+
 let productsHtml = "";
+
 products.forEach((product) => {
   productsHtml += ` <div class="product-container">
     <div class="product-image-container">
@@ -92,8 +96,23 @@ document.querySelectorAll(".js-add-to-cart").forEach((button) => {
     );
     addedMessage.classList.add("add-Opacity");
 
-    setTimeout(() => {
+    const addedMessageTimeouts = {};
+    const previousTimeoutId = addedMessageTimeouts[productId];
+
+    if (previousTimeoutId) {
+      console
+        .log
+        // `Previous Timeout for product ${productId}: ${previousTimeoutId}`
+        ();
+      clearTimeout(previousTimeoutId);
+      // console.log(`Timeout for product ${productId} cleared.`);
+    }
+
+    const startTimeOutId = setTimeout(() => {
       addedMessage.classList.remove("add-Opacity");
     }, 2000);
+
+    addedMessageTimeouts[productId] = startTimeOutId;
+    //console.log(`New Timeout for product ${productId}: ${startTimeOutId}`);
   });
 });
